@@ -95,10 +95,18 @@ public class Controller extends DefaultHandler  {
 						
 						Word wordLemma = controller.searchLemma(words2, lemma);
 						WordElement wordElement = controller.new WordElement();
-						wordElement.fragment = fragment;
-						wordElement.word = element.originalForm+"-"+pos;
-						wordLemma.elements.add(wordElement);
-						
+						boolean exists = true;
+						for(int l=0; l < wordLemma.elements.size(); l++){
+							WordElement aux = wordLemma.elements.get(l);
+							if(aux.word.equals(word) && aux.fragment.number.equals(fragment.number)){
+								exists = false;
+							}
+						}
+						if(exists){
+							wordElement.fragment = fragment;
+							wordElement.word = word;
+							wordLemma.elements.add(wordElement);
+						}
 //						if(lemmas.get(lemma) == null){
 //							lemmas.put(lemma, new ArrayList<Object>());
 //						}
