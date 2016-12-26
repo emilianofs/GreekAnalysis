@@ -29,10 +29,10 @@ public class GroupMatchHandler extends DefaultHandler {
 		InputStream is = new FileInputStream("c:\\greek.morph.xml");
 		
 		List<WordForm> list = new ArrayList<WordForm>();
-		list.add(new WordForm("*(/arpagos"));
-		list.add(new WordForm("'fo/roun"));
-		list.add(new WordForm("'mme/nwn"));
-		list.add(new WordForm("'qa\\non"));
+		list.add(new WordForm("kai/"));
+//		list.add(new WordForm("'fo/roun"));
+//		list.add(new WordForm("'mme/nwn"));
+//		list.add(new WordForm("'qa\\non"));
 		
 		
 		GroupMatchHandler handler = new GroupMatchHandler(list);
@@ -61,6 +61,7 @@ public class GroupMatchHandler extends DefaultHandler {
 	public static class WordForm{
 		public String originalForm;
 		public String matchForm; 
+		public String lemma;
 		public List<Map<String,String>> result = new ArrayList<Map<String,String>>();
 
 		public WordForm(String form){
@@ -72,7 +73,7 @@ public class GroupMatchHandler extends DefaultHandler {
 				tc.setConverter("BetaCode");
 				matchForm = tc.getString(form);
 
-				System.out.println(matchForm);
+//				System.out.println(matchForm);
 				matchForm = matchForm.toLowerCase();
 				matchForm = matchForm.replace("\\", "/");
 //				System.out.println(matchForm);
@@ -96,7 +97,7 @@ public class GroupMatchHandler extends DefaultHandler {
 		
 	}
 
-	private WordForm elementFound;
+	private List<WordForm> elementsFound = new ArrayList<WordForm>();
 
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		super.endElement(uri, localName, qName);
@@ -108,9 +109,9 @@ public class GroupMatchHandler extends DefaultHandler {
 				WordForm element = searchList.get(i);
 				if(element.matchForm.equals(value)){
 					inFoundElement  = true;
-					elementFound = element;
+					elementsFound.add(element);
 //					searchList.remove(elementFound);
-					System.out.println("elementFound: "+value);
+//					System.out.println("elementFound: "+value);
 				}
 			}
 		}
@@ -122,8 +123,12 @@ public class GroupMatchHandler extends DefaultHandler {
 		if(qName.equals(PARENT_ELEMENT)){
 			if(inFoundElement){
 //				System.out.println("FoundElement "+elementFoundMap.toString());
-				elementFound.result.add(elementFoundMap);
+				for(WordForm element: elementsFound){
+					element.result.add(elementFoundMap);
+					element.lemma = elementFoundMap.get("form");
+				}
 				elementFoundMap = new HashMap<String,String>();
+				elementsFound = new ArrayList<WordForm>();
 			}
 			inFoundElement = false;
 		}

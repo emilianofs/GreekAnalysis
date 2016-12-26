@@ -1,72 +1,220 @@
 package controller;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import controller.GroupMatchHandler.WordForm;
-import edu.unc.epidoc.transcoder.TransCoder;
 
 public class Controller extends DefaultHandler  {
 
 	public static void main(String[] args) {
-
-
-		//		String source = "A)/NDRA MOI E)/NNEPE, MOU=SA";
-		//		String source = "A)/NDRA";
+		Controller controller = new Controller();
 		try {
-			//			String source = "A)/NDRA MOI E)/NNEPE, MOU=SA";
+	
+//			String source = "ὄνους σύρματ' ἂν ἑλέσθαι μᾶλλον ἢ χρυσόν";
 			//			TransCoder tc = new TransCoder();
-			//			tc.setParser("BetaCode");
-			//			tc.setConverter("UnicodeD");
+			//			tc.setParser("Unicode");
+			//			tc.setConverter("BetaCode");
 			//			String result = tc.getString(source);
+			//
+			//			System.out.println(source);
+			//			System.out.println(result);
+//			String[] words = source.split(" ");
 
-
-			//				String source = "τιμῶσι";
-//			String source = "ἀρηιφάτους θεοὶ τιμῶσι καὶ ἄνθρωποι";
-//			String source = "εἰ πάντα τὰ ὄντα καπνὸς γένοιτο ῥῖνες ἂν διαγνοῖεν";
-			String source = "ὄνους σύρματ' ἂν ἑλέσθαι μᾶλλον ἢ χρυσόν";
-//			TransCoder tc = new TransCoder();
-//			tc.setParser("Unicode");
-//			tc.setConverter("BetaCode");
-//			String result = tc.getString(source);
-//
-//			System.out.println(source);
-//			System.out.println(result);
+			List<WordForm> list = new ArrayList<WordForm>();
 			
-			
-			String[] words = source.split(" ");
-
+			List<Fragment> fragments = controller.readXml();
+			for(Fragment f: fragments){
+				System.out.println("Number: "+f.number+" Text: "+f.text);
+				String[] words = f.text.split(" ");
+				for(String word: words){
+					word = word.replace(".", "");
+					word = word.replace("·", "");
+					word = word.replace(",", "");
+					f.wordForm.add(new WordForm(word));
+				}
+				list.addAll(f.wordForm);				
+			}
 			SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
 			InputStream is = new FileInputStream("c:\\greek.morph.xml");
 
-			List<WordForm> list = new ArrayList<WordForm>();
-			for(String word: words){
-				list.add(new WordForm(word));
-			}
-
 			GroupMatchHandler handler = new GroupMatchHandler(list);
 
+			System.out.println("START PARSE----------------------------");
+			System.out.println("Looking up for "+list.size()+" words");
 			saxParser.parse(is, handler);
 
-			for(int i=0; i <list.size(); i++){
-				WordForm element = list.get(i);
-				if(element.result != null){
-					System.out.println("OriginalForm: "+element.originalForm+" result: "+element.result.size());
+			System.out.println("END PARSE----------------------------\n");
+
+			Set<String> words = new HashSet();
+			Map<String, List<String>> map = new HashMap<String, List<String>>();
+			Map<String, List<Object>> lemmas = new HashMap<String, List<Object>>();
+	
+			List<Word> words2= new ArrayList<Word>();
+			
+			
+			// Lemma -> Formas
+			for(int i=0; i <fragments.size(); i++){
+				Fragment fragment = fragments.get(i);
+				System.out.println("Number: "+fragment.number+" Text: "+fragment.text);
+				for(int j=0; j<fragment.wordForm.size();j++){
+					WordForm element = fragment.wordForm.get(j);
+//					System.out.println("\t\tOriginalForm: "+element.originalForm+" matchForm: '"+element.matchForm+"' result: "+element.result.size());
+					System.out.println("LEMA "+element.lemma);
+					
+					
+					
+					for(int k=0; k<element.result.size();k++){
+						String word = element.originalForm;
+						String lemma = element.result.get(k).get("lemma");
+						String pos = element.result.get(k).get("pos");
+
+//						String form = element.originalForm;
+//						words.add(word);
+						
+						Word wordLemma = controller.searchLemma(words2, lemma);
+						WordElement wordElement = controller.new WordElement();
+						wordElement.fragment = fragment;
+						wordElement.word = element.originalForm+"-"+pos;
+						wordLemma.elements.add(wordElement);
+						
+//						if(lemmas.get(lemma) == null){
+//							lemmas.put(lemma, new ArrayList<Object>());
+//						}
+//						
+						if(map.get(lemma) == null){
+							map.put(lemma, new ArrayList<String>());
+						}
+						
+						List<String> forms = map.get(lemma);
+						forms.add(word);
+						
+//						System.out.println("\t\t\t "+element.result.get(k).toString());
+					}
 				}
 			}
-//aaaa
-
+			
+//			Set<String> keySet = map.keySet();
+//			for(String key: keySet){
+//				System.out.println(key+ ";"+map.get(key).size());
+//				List<String> forms = map.get(key);
+//				for(int i=0; i<forms.size(); i++){
+//					System.out.println("Form: "+forms.get(i));
+//				}
+//			}
+			
+			for(Word word: words2){
+				System.out.print(word.lemma+";"+word.elements.size()+";");
+				for(WordElement wordElement: word.elements){
+					System.out.print(wordElement.word+"("+wordElement.fragment.number+"),");
+				}
+				System.out.println("");
+			}
+			
+//			for(String word: words){
+//				System.out.println("word: "+word);
+//			}
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
+	public class Fragment{
+		public String number;
+		public String text;
+		public List<WordForm> wordForm = new ArrayList<WordForm>();
+	}
+	
+	public List<Fragment> readXml () throws ParserConfigurationException{
+		List<Fragment> response = new ArrayList<Fragment>();
+		File fXmlFile = new File("fragments.xml");
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = null;
+		try {
+			doc = dBuilder.parse(fXmlFile);
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		doc.getDocumentElement().normalize();
+		System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+		NodeList nList = doc.getElementsByTagName("fragment");
+		System.out.println("----------------------------");
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+			Node nNode = nList.item(temp);
+//			System.out.println("\nCurrent Element :" + nNode.getNodeName());
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				Fragment fragment = new Fragment();
+				fragment.number =  eElement.getElementsByTagName("number").item(0).getTextContent();
+				fragment.text =  eElement.getElementsByTagName("text").item(0).getTextContent().replace("\n", "").replace("\r", "").replace("\t", "");
+				response.add(fragment);
+//				System.out.println("Fragment No : " + eElement.getElementsByTagName("number").item(0).getTextContent());
+//				System.out.println("Text : " + eElement.getElementsByTagName("text").item(0).getTextContent());
+
+			}
+		}
+		return response;
+	}
+	
+	public class WordElement{
+		Fragment fragment;
+		String word;
+		
+	}
+	
+	public class Word{
+		String lemma;
+		List<WordElement> elements;
+	}
+	
+	public Word searchLemma(List<Word> words, String lemma){
+		Word response = null;
+		for(int i=0; i < words.size(); i++){
+			if(words.get(i).lemma.equals(lemma)){
+				response = words.get(i);
+			}
+		}
+		
+		if(response == null){
+			Word newLemma = new Word();
+			newLemma.lemma = lemma;
+			newLemma.elements = new ArrayList<WordElement>();
+			words.add(newLemma);
+			response = newLemma;
+		}
+		
+		
+		return response;
+	}
+	
 }
