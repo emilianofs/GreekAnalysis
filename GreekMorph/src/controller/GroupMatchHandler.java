@@ -16,7 +16,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import edu.unc.epidoc.transcoder.TransCoder;
+import entities.WordForm;
 
 public class GroupMatchHandler extends DefaultHandler {
 	private final String PARENT_ELEMENT = "analysis";
@@ -58,30 +58,6 @@ public class GroupMatchHandler extends DefaultHandler {
 //		}
 //	}
 	
-	public static class WordForm{
-		public String originalForm;
-		public String matchForm; 
-		public String lemma;
-		public List<Map<String,String>> result = new ArrayList<Map<String,String>>();
-
-		public WordForm(String form){
-			try{
-				originalForm = form;
-
-				TransCoder tc = new TransCoder();
-				tc.setParser("Unicode");
-				tc.setConverter("BetaCode");
-				matchForm = tc.getString(form);
-
-//				System.out.println(matchForm);
-				matchForm = matchForm.toLowerCase();
-				matchForm = matchForm.replace("\\", "/");
-//				System.out.println(matchForm);
-			}catch(Exception e){
-
-			}
-		}
-	}
 
 	private List<WordForm> searchList = new ArrayList<WordForm>();
 	public GroupMatchHandler(List<WordForm> searchList){

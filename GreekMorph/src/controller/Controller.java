@@ -20,9 +20,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import controller.GroupMatchHandler.WordForm;
-import dataModels.Graph;
 import edu.unc.epidoc.transcoder.TransCoder;
+import entities.Fragment;
+import entities.Word;
+import entities.WordElement;
+import entities.WordForm;
+
 
 public class Controller extends DefaultHandler  {
 
@@ -88,18 +91,18 @@ public class Controller extends DefaultHandler  {
 						lemma = tc.getString(lemma);
 						
 						Word wordLemma = controller.searchLemma(words, lemma);
-						WordElement wordElement = controller.new WordElement();
+						WordElement wordElement = new WordElement();
 						
 						boolean exists = true;
 						for(int l=0; l < wordLemma.elements.size(); l++){
 							WordElement aux = wordLemma.elements.get(l);
-							if(aux.word.equals(word) && aux.fragment.number.equals(fragment.number)){
+							if(aux.originalForm.equals(word) && aux.fragment.number.equals(fragment.number)){
 								exists = false;
 							}
 						}
 						if(exists){
 							wordElement.fragment = fragment;
-							wordElement.word = word;
+							wordElement.originalForm = word;
 							wordLemma.elements.add(wordElement);
 						}
 
@@ -127,24 +130,24 @@ public class Controller extends DefaultHandler  {
 //					System.out.println("Form: "+forms.get(i));
 //				}
 //			}
-			Graph graph = new Graph(fragments.size());
-			
-			for(Word word: words){
-//				System.out.print(word.lemma+";"+word.elements.size()+";");
-				for(WordElement wordElement1: word.elements){
-					
-					Fragment fragment1 = wordElement1.fragment;
-					for(WordElement wordElement2: word.elements){
-						Fragment fragment2 = wordElement2.fragment;
-						if(!graph.isEdge(fragment1.id, fragment2.id)){
-							graph.addEdge(fragment1.id, fragment2.id);
-						}
-					}
-
-				}
-			}
-			
-			graph.print();
+//			Graph graph = new Graph(fragments.size());
+//			
+//			for(Word word: words){
+////				System.out.print(word.lemma+";"+word.elements.size()+";");
+//				for(WordElement wordElement1: word.elements){
+//					
+//					Fragment fragment1 = wordElement1.fragment;
+//					for(WordElement wordElement2: word.elements){
+//						Fragment fragment2 = wordElement2.fragment;
+//						if(!graph.isEdge(fragment1.id, fragment2.id)){
+//							graph.addEdge(fragment1.id, fragment2.id);
+//						}
+//					}
+//
+//				}
+//			}
+//			
+//			graph.print();
 			/************************************************/
 //			for(Word word: words){
 //				for(WordElement wordElement1: word.elements){
@@ -216,24 +219,6 @@ public class Controller extends DefaultHandler  {
 			}
 		}
 		return response;
-	}
-	
-	public class Fragment{
-		public String number;
-		public String text;
-		public int id;
-		public List<WordForm> wordForm = new ArrayList<WordForm>();
-	}
-	
-	public class WordElement{
-		Fragment fragment;
-		String word;
-		
-	}
-	
-	public class Word{
-		String lemma;
-		List<WordElement> elements;
 	}
 	
 	public Word searchLemma(List<Word> words, String lemma){
