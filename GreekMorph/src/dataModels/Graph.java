@@ -8,6 +8,12 @@ public class Graph {
     public Graph(int vertexCount) {
           this.vertexCount = vertexCount;
           adjacencyMatrix = new boolean[vertexCount][vertexCount];
+          for(int i=0; i< vertexCount; i++){
+      		for(int j=0; j< vertexCount;j++){
+      			adjacencyMatrix[i][j] = false;
+      		}
+      		System.out.println("");
+      	}
     }
 
     public void addEdge(int i, int j) {
@@ -32,21 +38,21 @@ public class Graph {
     }
     
     public void print(){
-    	System.out.println(";");
+    	System.out.print(",");
     	for(int i=0; i< vertexCount; i++){
     		System.out.print(i);
     		if(i<vertexCount){
-				System.out.print(";");
+				System.out.print(",");
 			}
     	}
     	System.out.println("");
     	
     	for(int i=0; i< vertexCount; i++){
-    		System.out.print(i+";");
+    		System.out.print(i+",");
     		for(int j=0; j< vertexCount;j++){
     			System.out.print(adjacencyMatrix[i][j]);
     			if(j<vertexCount){
-    				System.out.print(";");
+    				System.out.print(",");
     			}
     		}
     		System.out.println("");

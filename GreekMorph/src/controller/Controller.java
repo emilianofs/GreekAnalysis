@@ -106,10 +106,15 @@ public class Controller extends DefaultHandler  {
 					}
 				}
 			}
+			
+//			Graph graph = new SingleGraph("Tutorial 1");
+
+			
 			System.out.println("----------------------------");
 			int i = 0;
 			for(Fragment f: fragments){
 				System.out.println(i+++";"+f.number);
+//				graph.addNode(f.number);
 			}
 			
 			System.out.println("----------------------------");
@@ -127,6 +132,7 @@ public class Controller extends DefaultHandler  {
 			for(Word word: words){
 //				System.out.print(word.lemma+";"+word.elements.size()+";");
 				for(WordElement wordElement1: word.elements){
+					
 					Fragment fragment1 = wordElement1.fragment;
 					for(WordElement wordElement2: word.elements){
 						Fragment fragment2 = wordElement2.fragment;
@@ -134,17 +140,28 @@ public class Controller extends DefaultHandler  {
 							graph.addEdge(fragment1.id, fragment2.id);
 						}
 					}
-					
-//					System.out.print(wordElement.word+"("+wordElement.fragment.number+"),");
-//					System.out.print(wordElement.fragment.number+",");
-//					graph.addEdge(arg0, arg1, arg2)
-//					System.out.println(word.lemma+";"+wordElement.word+";"+wordElement.fragment.number);
+
 				}
-//				System.out.println("");
 			}
 			
 			graph.print();
-				
+			/************************************************/
+//			for(Word word: words){
+//				for(WordElement wordElement1: word.elements){
+//					Fragment fragment1 = wordElement1.fragment;
+//					for(WordElement wordElement2: word.elements){
+//						Fragment fragment2 = wordElement2.fragment;
+//						try{
+//							graph.addEdge(fragment1.number+"-"+fragment2.number, fragment1.number, fragment2.number);
+//						}catch(Exception e){
+//							e.printStackTrace();
+//						}
+//					}
+//
+//				}
+//			}
+//			graph.display();
+			/************************************************/
 //			for(Word word: words){
 //				System.out.print(word.lemma+";"+word.elements.size()+";");
 //				for(WordElement wordElement: word.elements){
