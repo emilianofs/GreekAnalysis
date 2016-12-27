@@ -5,11 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,6 +21,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import controller.GroupMatchHandler.WordForm;
+import dataModels.Graph;
+import edu.unc.epidoc.transcoder.TransCoder;
 
 public class Controller extends DefaultHandler  {
 
@@ -66,13 +64,12 @@ public class Controller extends DefaultHandler  {
 			saxParser.parse(is, handler);
 
 			System.out.println("END PARSE----------------------------\n");
-
-			Set<String> words = new HashSet();
-			Map<String, List<String>> map = new HashMap<String, List<String>>();
-			Map<String, List<Object>> lemmas = new HashMap<String, List<Object>>();
-	
-			List<Word> words2= new ArrayList<Word>();
+				
+			List<Word> words= new ArrayList<Word>();
 			
+			TransCoder tc = new TransCoder();
+			tc.setParser("BetaCode");
+			tc.setConverter("UnicodeC");
 			
 			// Lemma -> Formas
 			for(int i=0; i <fragments.size(); i++){
@@ -81,20 +78,18 @@ public class Controller extends DefaultHandler  {
 				for(int j=0; j<fragment.wordForm.size();j++){
 					WordForm element = fragment.wordForm.get(j);
 //					System.out.println("\t\tOriginalForm: "+element.originalForm+" matchForm: '"+element.matchForm+"' result: "+element.result.size());
-					System.out.println("LEMA "+element.lemma);
+//					System.out.println("LEMA "+element.lemma);
 					
 					
 					
 					for(int k=0; k<element.result.size();k++){
 						String word = element.originalForm;
 						String lemma = element.result.get(k).get("lemma");
-						String pos = element.result.get(k).get("pos");
-
-//						String form = element.originalForm;
-//						words.add(word);
+						lemma = tc.getString(lemma);
 						
-						Word wordLemma = controller.searchLemma(words2, lemma);
+						Word wordLemma = controller.searchLemma(words, lemma);
 						WordElement wordElement = controller.new WordElement();
+						
 						boolean exists = true;
 						for(int l=0; l < wordLemma.elements.size(); l++){
 							WordElement aux = wordLemma.elements.get(l);
@@ -107,21 +102,17 @@ public class Controller extends DefaultHandler  {
 							wordElement.word = word;
 							wordLemma.elements.add(wordElement);
 						}
-//						if(lemmas.get(lemma) == null){
-//							lemmas.put(lemma, new ArrayList<Object>());
-//						}
-//						
-						if(map.get(lemma) == null){
-							map.put(lemma, new ArrayList<String>());
-						}
-						
-						List<String> forms = map.get(lemma);
-						forms.add(word);
-						
-//						System.out.println("\t\t\t "+element.result.get(k).toString());
+
 					}
 				}
 			}
+			System.out.println("----------------------------");
+			int i = 0;
+			for(Fragment f: fragments){
+				System.out.println(i+++";"+f.number);
+			}
+			
+			System.out.println("----------------------------");
 			
 //			Set<String> keySet = map.keySet();
 //			for(String key: keySet){
@@ -131,30 +122,45 @@ public class Controller extends DefaultHandler  {
 //					System.out.println("Form: "+forms.get(i));
 //				}
 //			}
+			Graph graph = new Graph(fragments.size());
 			
-			for(Word word: words2){
-				System.out.print(word.lemma+";"+word.elements.size()+";");
-				for(WordElement wordElement: word.elements){
-					System.out.print(wordElement.word+"("+wordElement.fragment.number+"),");
+			for(Word word: words){
+//				System.out.print(word.lemma+";"+word.elements.size()+";");
+				for(WordElement wordElement1: word.elements){
+					Fragment fragment1 = wordElement1.fragment;
+					for(WordElement wordElement2: word.elements){
+						Fragment fragment2 = wordElement2.fragment;
+						if(!graph.isEdge(fragment1.id, fragment2.id)){
+							graph.addEdge(fragment1.id, fragment2.id);
+						}
+					}
+					
+//					System.out.print(wordElement.word+"("+wordElement.fragment.number+"),");
+//					System.out.print(wordElement.fragment.number+",");
+//					graph.addEdge(arg0, arg1, arg2)
+//					System.out.println(word.lemma+";"+wordElement.word+";"+wordElement.fragment.number);
 				}
-				System.out.println("");
+//				System.out.println("");
 			}
 			
-//			for(String word: words){
-//				System.out.println("word: "+word);
+			graph.print();
+				
+//			for(Word word: words){
+//				System.out.print(word.lemma+";"+word.elements.size()+";");
+//				for(WordElement wordElement: word.elements){
+//					System.out.print(wordElement.fragment.number+",");
+//				}
+//				System.out.println("");
 //			}
 			
+					
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public class Fragment{
-		public String number;
-		public String text;
-		public List<WordForm> wordForm = new ArrayList<WordForm>();
-	}
+
 	
 	public List<Fragment> readXml () throws ParserConfigurationException{
 		List<Fragment> response = new ArrayList<Fragment>();
@@ -176,7 +182,7 @@ public class Controller extends DefaultHandler  {
 		System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 		NodeList nList = doc.getElementsByTagName("fragment");
 		System.out.println("----------------------------");
-
+		int id = 0;
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);
 //			System.out.println("\nCurrent Element :" + nNode.getNodeName());
@@ -185,6 +191,7 @@ public class Controller extends DefaultHandler  {
 				Fragment fragment = new Fragment();
 				fragment.number =  eElement.getElementsByTagName("number").item(0).getTextContent();
 				fragment.text =  eElement.getElementsByTagName("text").item(0).getTextContent().replace("\n", "").replace("\r", "").replace("\t", "");
+				fragment.id = id++;
 				response.add(fragment);
 //				System.out.println("Fragment No : " + eElement.getElementsByTagName("number").item(0).getTextContent());
 //				System.out.println("Text : " + eElement.getElementsByTagName("text").item(0).getTextContent());
@@ -192,6 +199,13 @@ public class Controller extends DefaultHandler  {
 			}
 		}
 		return response;
+	}
+	
+	public class Fragment{
+		public String number;
+		public String text;
+		public int id;
+		public List<WordForm> wordForm = new ArrayList<WordForm>();
 	}
 	
 	public class WordElement{
