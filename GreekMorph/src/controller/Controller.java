@@ -22,7 +22,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import edu.unc.epidoc.transcoder.TransCoder;
 import entities.Fragment;
-import entities.Word;
+import entities.Lemma;
 import entities.WordElement;
 import entities.WordForm;
 
@@ -68,7 +68,7 @@ public class Controller extends DefaultHandler  {
 
 			System.out.println("END PARSE----------------------------\n");
 				
-			List<Word> words= new ArrayList<Word>();
+			List<Lemma> words= new ArrayList<Lemma>();
 			
 			TransCoder tc = new TransCoder();
 			tc.setParser("BetaCode");
@@ -90,7 +90,7 @@ public class Controller extends DefaultHandler  {
 						String lemma = element.result.get(k).get("lemma");
 						lemma = tc.getString(lemma);
 						
-						Word wordLemma = controller.searchLemma(words, lemma);
+						Lemma wordLemma = controller.searchLemma(words, lemma);
 						WordElement wordElement = new WordElement();
 						
 						boolean exists = true;
@@ -211,7 +211,6 @@ public class Controller extends DefaultHandler  {
 				Fragment fragment = new Fragment();
 				fragment.number =  eElement.getElementsByTagName("number").item(0).getTextContent();
 				fragment.text =  eElement.getElementsByTagName("text").item(0).getTextContent().replace("\n", "").replace("\r", "").replace("\t", "");
-				fragment.id = id++;
 				response.add(fragment);
 //				System.out.println("Fragment No : " + eElement.getElementsByTagName("number").item(0).getTextContent());
 //				System.out.println("Text : " + eElement.getElementsByTagName("text").item(0).getTextContent());
@@ -221,8 +220,8 @@ public class Controller extends DefaultHandler  {
 		return response;
 	}
 	
-	public Word searchLemma(List<Word> words, String lemma){
-		Word response = null;
+	public Lemma searchLemma(List<Lemma> words, String lemma){
+		Lemma response = null;
 		for(int i=0; i < words.size(); i++){
 			if(words.get(i).lemma.equals(lemma)){
 				response = words.get(i);
@@ -230,7 +229,7 @@ public class Controller extends DefaultHandler  {
 		}
 		
 		if(response == null){
-			Word newLemma = new Word();
+			Lemma newLemma = new Lemma();
 			newLemma.lemma = lemma;
 			newLemma.elements = new ArrayList<WordElement>();
 			words.add(newLemma);
