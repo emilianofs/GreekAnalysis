@@ -1,5 +1,5 @@
 package entities;
 
-public class Work {
+public class Discourse {
 
 }

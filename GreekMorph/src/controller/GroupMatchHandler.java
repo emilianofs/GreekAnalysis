@@ -16,40 +16,48 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import entities.WordForm;
+import entities.words.Word;
+import entities.words.WordLemma;
 
 public class GroupMatchHandler extends DefaultHandler {
 	private final String PARENT_ELEMENT = "analysis";
 	private final String FORM_ELEMENT = "form";
 
+	private Controller controller;
 
+	public Controller getController() {
+		return controller;
+	}
 
+	public void setController(Controller controller) {
+		this.controller = controller;
+	}
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
 		InputStream is = new FileInputStream("c:\\greek.morph.xml");
 		
-		List<WordForm> list = new ArrayList<WordForm>();
-		list.add(new WordForm("kai/"));
-//		list.add(new WordForm("'fo/roun"));
-//		list.add(new WordForm("'mme/nwn"));
-//		list.add(new WordForm("'qa\\non"));
+		List<Word> list = new ArrayList<Word>();
+		list.add(new Word("kai/"));
+//		list.add(new Word("'fo/roun"));
+//		list.add(new Word("'mme/nwn"));
+//		list.add(new Word("'qa\\non"));
 		
 		
 		GroupMatchHandler handler = new GroupMatchHandler(list);
 		saxParser.parse(is, handler);
 
 		for(int i=0; i<list.size();i++){
-			WordForm element = list.get(i);
+			Word element = list.get(i);
 			System.out.println("Form: "+element.matchForm+" result: "+element.result.toString());
 		}
 
 	}
 
-//	public static class WordForm{
+//	public static class Word{
 //		public String matchForm; 
 //		public Map<String,String> result;
 //
-//		public WordForm(String form){
+//		public Word(String form){
 //			System.out.println(form);
 //			form = form.toLowerCase();
 //			form = form.replace("\\", "/");
@@ -59,8 +67,9 @@ public class GroupMatchHandler extends DefaultHandler {
 //	}
 	
 
-	private List<WordForm> searchList = new ArrayList<WordForm>();
-	public GroupMatchHandler(List<WordForm> searchList){
+
+	private List<Word> searchList = new ArrayList<Word>();
+	public GroupMatchHandler(List<Word> searchList){
 		this.searchList.addAll(searchList);
 	}
 
@@ -73,7 +82,7 @@ public class GroupMatchHandler extends DefaultHandler {
 		
 	}
 
-	private List<WordForm> elementsFound = new ArrayList<WordForm>();
+	private List<Word> elementsFound = new ArrayList<Word>();
 
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		super.endElement(uri, localName, qName);
@@ -82,7 +91,7 @@ public class GroupMatchHandler extends DefaultHandler {
 		if(qName.equals(FORM_ELEMENT)){
 //			System.out.println("InFormElement("+qName+"/"+value+")");
 			for(int i=0; i < searchList.size(); i++){
-				WordForm element = searchList.get(i);
+				Word element = searchList.get(i);
 				if(element.matchForm.equals(value)){
 					inFoundElement  = true;
 					elementsFound.add(element);
@@ -99,12 +108,12 @@ public class GroupMatchHandler extends DefaultHandler {
 		if(qName.equals(PARENT_ELEMENT)){
 			if(inFoundElement){
 //				System.out.println("FoundElement "+elementFoundMap.toString());
-				for(WordForm element: elementsFound){
+				for(Word element: elementsFound){
 					element.result.add(elementFoundMap);
 					element.lemma = elementFoundMap.get("form");
 				}
 				elementFoundMap = new HashMap<String,String>();
-				elementsFound = new ArrayList<WordForm>();
+				elementsFound = new ArrayList<Word>();
 			}
 			inFoundElement = false;
 		}
@@ -113,6 +122,12 @@ public class GroupMatchHandler extends DefaultHandler {
 
 	}
 
+	public WordLemma searchWordLemma(String lemma){
+		WordLemma response = null;
+		
+		
+		return response;
+	}
 	public void characters(char[] chars, int start, int length) throws SAXException {
 		tagText.append(chars, start, length);
 	}

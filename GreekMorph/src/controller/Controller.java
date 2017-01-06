@@ -21,10 +21,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import edu.unc.epidoc.transcoder.TransCoder;
-import entities.Fragment;
-import entities.Lemma;
-import entities.WordElement;
-import entities.WordForm;
+import entities.DiscourseFragment;
+import entities.words.Word;
+import entities.words.WordLemma;
 
 
 public class Controller extends DefaultHandler  {
@@ -43,17 +42,17 @@ public class Controller extends DefaultHandler  {
 			//			System.out.println(result);
 //			String[] words = source.split(" ");
 
-			List<WordForm> list = new ArrayList<WordForm>();
+			List<Word> list = new ArrayList<Word>();
 			
-			List<Fragment> fragments = controller.readXml();
-			for(Fragment f: fragments){
+			List<DiscourseFragment> fragments = controller.readXml();
+			for(DiscourseFragment f: fragments){
 				System.out.println("Number: "+f.number+" Text: "+f.text);
 				String[] words = f.text.split(" ");
 				for(String word: words){
 					word = word.replace(".", "");
 					word = word.replace("·", "");
 					word = word.replace(",", "");
-					f.wordForm.add(new WordForm(word));
+					f.wordForm.add(new Word(word));
 				}
 				list.addAll(f.wordForm);				
 			}
@@ -68,7 +67,7 @@ public class Controller extends DefaultHandler  {
 
 			System.out.println("END PARSE----------------------------\n");
 				
-			List<Lemma> words= new ArrayList<Lemma>();
+			List<WordLemma> words= new ArrayList<WordLemma>();
 			
 			TransCoder tc = new TransCoder();
 			tc.setParser("BetaCode");
@@ -76,10 +75,10 @@ public class Controller extends DefaultHandler  {
 			
 			// Lemma -> Formas
 			for(int i=0; i <fragments.size(); i++){
-				Fragment fragment = fragments.get(i);
+				DiscourseFragment fragment = fragments.get(i);
 				System.out.println("Number: "+fragment.number+" Text: "+fragment.text);
 				for(int j=0; j<fragment.wordForm.size();j++){
-					WordForm element = fragment.wordForm.get(j);
+					Word element = fragment.wordForm.get(j);
 //					System.out.println("\t\tOriginalForm: "+element.originalForm+" matchForm: '"+element.matchForm+"' result: "+element.result.size());
 //					System.out.println("LEMA "+element.lemma);
 					
@@ -90,12 +89,12 @@ public class Controller extends DefaultHandler  {
 						String lemma = element.result.get(k).get("lemma");
 						lemma = tc.getString(lemma);
 						
-						Lemma wordLemma = controller.searchLemma(words, lemma);
-						WordElement wordElement = new WordElement();
+						WordLemma wordLemma = controller.searchLemma(words, lemma);
+						Word wordElement = new Word();
 						
 						boolean exists = true;
 						for(int l=0; l < wordLemma.elements.size(); l++){
-							WordElement aux = wordLemma.elements.get(l);
+							Word aux = wordLemma.elements.get(l);
 							if(aux.originalForm.equals(word) && aux.fragment.number.equals(fragment.number)){
 								exists = false;
 							}
@@ -115,7 +114,7 @@ public class Controller extends DefaultHandler  {
 			
 			System.out.println("----------------------------");
 			int i = 0;
-			for(Fragment f: fragments){
+			for(DiscourseFragment f: fragments){
 				System.out.println(i+++";"+f.number);
 //				graph.addNode(f.number);
 			}
@@ -182,8 +181,8 @@ public class Controller extends DefaultHandler  {
 
 
 	
-	public List<Fragment> readXml () throws ParserConfigurationException{
-		List<Fragment> response = new ArrayList<Fragment>();
+	public List<DiscourseFragment> readXml () throws ParserConfigurationException{
+		List<DiscourseFragment> response = new ArrayList<DiscourseFragment>();
 		File fXmlFile = new File("fragments.xml");
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -208,7 +207,7 @@ public class Controller extends DefaultHandler  {
 //			System.out.println("\nCurrent Element :" + nNode.getNodeName());
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
-				Fragment fragment = new Fragment();
+				DiscourseFragment fragment = new DiscourseFragment();
 				fragment.number =  eElement.getElementsByTagName("number").item(0).getTextContent();
 				fragment.text =  eElement.getElementsByTagName("text").item(0).getTextContent().replace("\n", "").replace("\r", "").replace("\t", "");
 				response.add(fragment);
@@ -220,8 +219,8 @@ public class Controller extends DefaultHandler  {
 		return response;
 	}
 	
-	public Lemma searchLemma(List<Lemma> words, String lemma){
-		Lemma response = null;
+	public WordLemma searchLemma(List<WordLemma> words, String lemma){
+		WordLemma response = null;
 		for(int i=0; i < words.size(); i++){
 			if(words.get(i).lemma.equals(lemma)){
 				response = words.get(i);
@@ -229,9 +228,9 @@ public class Controller extends DefaultHandler  {
 		}
 		
 		if(response == null){
-			Lemma newLemma = new Lemma();
+			WordLemma newLemma = new WordLemma();
 			newLemma.lemma = lemma;
-			newLemma.elements = new ArrayList<WordElement>();
+			newLemma.elements = new ArrayList<Word>();
 			words.add(newLemma);
 			response = newLemma;
 		}
