@@ -32,7 +32,8 @@ public class Controller extends DefaultHandler  {
 //	private static Controller mainController = new Controller();
 	
 	public static void main(String[] args){
-//		Controller controller = new Controller();
+			System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
+		Controller controller = new Controller();
 		try {
 //			System.out.println("loadLemmas()");
 //			controller.mainViejo(args);

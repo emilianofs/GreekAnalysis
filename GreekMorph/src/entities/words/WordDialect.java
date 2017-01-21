@@ -14,7 +14,8 @@ public class WordDialect {
 		AEOLIC,
 		PARAD_FORM,
 		PROSE,
-		POETIC;
+		POETIC,
+		HOMERIC;
 		
 		public static Dialect fromString(String text) {
 			if (text != null) {
@@ -35,6 +36,8 @@ public class WordDialect {
 					return Dialect.PROSE;
 				case "poetic":
 					return Dialect.POETIC;
+				case "homeric":
+					return Dialect.HOMERIC;
 				}
 			}
 			return null;

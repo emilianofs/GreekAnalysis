@@ -13,6 +13,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -31,6 +34,7 @@ import entities.words.WordDialect;
 import entities.words.WordLemma;
 
 public class ControllerLoader {
+	private static final Logger logger = Logger.getLogger( ControllerLoader.class.getName() );
 
 
 	private List<WordLemma> lemmas = new ArrayList<WordLemma>();
@@ -102,31 +106,54 @@ public class ControllerLoader {
 		//			
 		//		}
 
-//		BlockingQueue<WordMorphDTO> sharedQueueInput = new LinkedBlockingQueue<WordMorphDTO>();
-//		Set<String> sharedWords = Collections.synchronizedSet(new HashSet<String>());
-//		Set<WordMorphDTO> wordsDto = Collections.synchronizedSet(new HashSet<WordMorphDTO>(results));
-//		List<Word> wordListSync = Collections.synchronizedList(words);
-//		List<WordLemma> wordLemmaListSync = Collections.synchronizedList(lemmas);
-//		List<WordDialect> wordDialectsListSync = Collections.synchronizedList(dialects);
-//		ExecutorService executor = Executors.newFixedThreadPool(8);
-//		System.out.println("DTOS "+wordsDto.size()+" items");
-//
-//        Runnable producer = new MorphProducer(sharedQueueInput, wordsDto);
-//    	executor.execute(producer); 
-//
-//		for(int i = 0; i < 9; i++){
-//			Runnable consumer = new MorphConsumer(sharedQueueInput, sharedWords, sharedWords, wordListSync, wordLemmaListSync, wordDialectsListSync);
-//			executor.execute(consumer); 	
+		BlockingQueue<WordMorphDTO> sharedQueueInput = new LinkedBlockingQueue<WordMorphDTO>();
+		AtomicBoolean semaphore = new AtomicBoolean(true);
+		Set<String> sharedWords = Collections.synchronizedSet(new HashSet<String>());
+		Set<String> sharedWordLemmas = Collections.synchronizedSet(new HashSet<String>());
+		Set<WordMorphDTO> wordsDto = Collections.synchronizedSet(new HashSet<WordMorphDTO>(results));
+		List<Word> wordListSync = Collections.synchronizedList(words);
+		List<WordLemma> wordLemmaListSync = Collections.synchronizedList(lemmas);
+		List<WordDialect> wordDialectsListSync = Collections.synchronizedList(dialects);
+		ExecutorService executor = Executors.newFixedThreadPool(2);
+		//		System.out.println("DTOS "+wordsDto.size()+" items");
+
+		Runnable producer = new MorphProducer(sharedQueueInput, wordsDto, semaphore);
+		executor.execute(producer); 
+		//		System.out.println("Queue size before "+sharedQueueInput.size()+" items");
+		//		Thread.sleep(5000);
+		//		System.out.println("Queue size after"+sharedQueueInput.size()+" items");
+		for(int i = 0; i < 1; i++){
+			Runnable consumer = new MorphConsumer(sharedQueueInput, sharedWords, sharedWordLemmas, wordListSync, wordLemmaListSync, wordDialectsListSync, semaphore);
+			executor.execute(consumer); 	
+		}
+
+		executor.shutdown();
+//		try {
+//			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
 //		}
-//		executor.shutdown();
-//
-//		while(!executor.isTerminated()){
-//			System.out.println("Left "+sharedQueueInput.size());
-//			System.out.println("Queue size "+sharedQueueInput.size()+" items");
-//			System.out.println("Words "+words.size()+" forms created");
-//			System.out.println("Word Lemmas "+lemmas.size()+" lemmas created");
-//			Thread.sleep(5000);
+				while(!executor.isTerminated()){
+				//	System.out.println("Left "+sharedQueueInput.size());
+				System.out.println("Queue size "+sharedQueueInput.size()+" items "+semaphore.get());
+				System.out.println("Words "+words.size()+" forms created");
+				System.out.println("Word Lemmas "+lemmas.size()+" lemmas created");
+				Thread.sleep(1000);
+			}
+
+
+		System.out.println("FIN Queue size "+sharedQueueInput.size()+" items");
+		System.out.println("FIN Words "+words.size()+" forms created, left "+wordsDto.size());
+		System.out.println("FIN Word Lemmas "+lemmas.size()+" lemmas created");
+		for(int i=0;i<words.size();i++){
+			Word aux = words.get(i);
+			logger.info("Word "+aux.getWord_betaCode()+" forms "+aux.getWordForms().size());
+		}
+//		for(int i=0;i<lemmas.size();i++){
+//			WordLemma aux = lemmas.get(i);
+//			logger.info("Lemma "+aux.getWord_betaCode());
 //		}
+		return;
 	}
 	public void lemmasLoadDom() throws Exception{
 		System.out.println("Starting lemmasLoad()----------------------------");

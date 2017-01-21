@@ -1,4 +1,4 @@
-package dataModels;
+package adts;
 
 public class ConjuntoLD implements ConjuntoTDA {
 

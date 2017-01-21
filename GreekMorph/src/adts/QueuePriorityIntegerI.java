@@ -1,4 +1,4 @@
-package dataModels;
+package adts;
 
 public interface QueuePriorityIntegerI {
 	void enqueue(Object elem, int prio);

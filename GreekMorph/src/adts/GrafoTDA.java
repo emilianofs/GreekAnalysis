@@ -1,4 +1,4 @@
-package dataModels;
+package adts;
 
 public interface GrafoTDA {
 	void InicializarGrafo();

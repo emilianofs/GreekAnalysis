@@ -9,6 +9,10 @@ public class WordForm {
 	<number>pl</number>
 	<number>sg</number>
 	 */
+	private WordLemma lemma;
+	private List<WordDialect> dialects = new ArrayList<WordDialect>();
+	private List<String> features = new ArrayList<String>();
+	
 	public enum Number{
 		DUAL,
 		PLURAL,
@@ -99,8 +103,7 @@ public class WordForm {
 		}
 	}
 
-	private List<WordDialect> dialects = new ArrayList<WordDialect>();
-	private List<String> features = new ArrayList<String>();
+
 //	
 //	public Number getNumber() {
 //		return number;
@@ -134,7 +137,13 @@ public class WordForm {
 	public void setDialects(List<WordDialect> dialects) {
 		this.dialects = dialects;
 	}
-	
 
+	public WordLemma getLemma() {
+		return lemma;
+	}
+
+	public void setLemma(WordLemma lemma) {
+		this.lemma = lemma;
+	}
 
 }
