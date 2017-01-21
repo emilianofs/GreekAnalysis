@@ -1,59 +1,37 @@
 package controller;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class ElementMatchHandler extends DefaultHandler {
-	
-	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
-		SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
-		//		InputStream is = ElementMatchHandler.class.getResourceAsStream("c:\\greek.morph.xml");
-		InputStream is = new FileInputStream("c:\\greek.morph.xml");
-		ElementMatchHandler matchHandler = new ElementMatchHandler("analysis", "form", "'*enuw/");
-		saxParser.parse(is, matchHandler);
-		
-		Map found = matchHandler.getFound();
-		
-		if (found != null)
-			System.out.println("matchHandler.getFound() = " + found);
-		else
-			System.out.println("Not found!");
-	}
+import dtos.WordMorphDTO;
 
-	private String elementName;
-	private String matchElement;
-	private String matchValue;
-	private Map found = new HashMap();
-
+public class ElementMatchHandler extends DefaultHandler{
+	private String elementName = "analysis";
 	private boolean inElement;
-	private boolean isMatched;
-	private Map elementMap = new HashMap();
+
+	private List<WordMorphDTO> result = new ArrayList<WordMorphDTO>();
+	
+	private WordMorphDTO aux;
+
 	private StringBuffer tagText = new StringBuffer();
 
-	public ElementMatchHandler(String elementName, String matchElement, String matchValue) {
+	public ElementMatchHandler(String elementName) {
 		this.elementName = elementName;
-		this.matchElement = matchElement;
-		this.matchValue = matchValue;
-		System.out.println("elementName: "+elementName+"\tmatchElement: "+matchElement+"\tmatchValue: "+matchValue);
 	}
 
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-//				System.out.println("StartElement: "+qName.toString());
+		//		System.out.println("StartElement: "+qName.toString());
 		if (qName.equals(elementName)){
+//			System.out.println(qName);
+			aux = new WordMorphDTO();
 			inElement = true;
 		}
 	}
+
 
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		super.endElement(uri, localName, qName);
@@ -61,24 +39,77 @@ public class ElementMatchHandler extends DefaultHandler {
 		//		System.out.println("qName: "+qName+"\t\telementName:"+elementName+"\t\tEndElement: "+text);
 		//		System.out.println("EndElement: "+qName);
 		if (qName.equals(elementName)) {
-			if (isMatched){
-//				found = elementMap;
-				found.putAll(elementMap);
-				elementMap = new HashMap();
-			}
-			isMatched = false;
+//			System.out.println(qName);
+			result.add(aux);
 			inElement = false;
+			
 		} else {
-			if (inElement)
-				elementMap.put(qName, text);
-			if (qName.equals(matchElement) && text.equals(matchValue)){
-				System.out.println("qName: "+qName+"\t\tmatchElement:"+matchElement+"\t\tmatchValue: "+matchValue+"\t\ttext: "+text);
-				isMatched = true;
+			if (inElement){
+				/*
+				x	analyses/analysis/case
+				x	analyses/analysis/degree
+				x	analyses/analysis/dialect
+				x	analyses/analysis/feature
+				x	analyses/analysis/form
+				x	analyses/analysis/gender
+				x	analyses/analysis/lemma
+				x	analyses/analysis/mood
+				x	analyses/analysis/number
+				x	analyses/analysis/person
+				x	analyses/analysis/pos
+				x	analyses/analysis/tense
+				x	analyses/analysis/voice
+					*/
+				
+//				System.out.println(qName+" text "+text);
+
+				switch(qName){
+				case "case":
+					aux.wCase = text;
+					break;
+				case "degree":
+					aux.degree = text;
+					break;
+				case "dialect":
+					aux.dialect = text;
+					break;
+				case "feature":
+					aux.feature = text;
+					break;
+				case "form":
+					aux.form = text;
+					break;
+				case "gender":
+					aux.gender = text;
+					break;
+				case "lemma":
+					aux.lemma = text;
+					break;
+				case "mood":
+					aux.mode = text;
+					break;
+				case "number":
+					aux.number  = text;
+					break;
+				case "person":
+					aux.person = text;
+					break;
+				case "pos":
+					aux.position = text;
+					break;
+				case "tense":
+					aux.tense = text;
+					break;
+				case "voice":
+					aux.voice = text;
+					break;
+				}
 			}
+
 		}
 		tagText = new StringBuffer();
 	}
-	
+
 	public void characters(char[] chars, int start, int length) throws SAXException {
 		if (inElement){
 			tagText.append(chars, start, length);
@@ -86,7 +117,7 @@ public class ElementMatchHandler extends DefaultHandler {
 		}
 	}
 
-	public Map getFound() {
-		return found;
+	public List<WordMorphDTO> getResults(){
+		return result;
 	}
 }

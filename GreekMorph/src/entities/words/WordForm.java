@@ -1,33 +1,140 @@
 package entities.words;
-//package entities;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Map;
-//
-//import edu.unc.epidoc.transcoder.TransCoder;
-//
-//public class WordForm{
-//	public String originalForm;
-//	public String matchForm; 
-//	public String lemma;
-//	public List<Map<String,String>> result = new ArrayList<Map<String,String>>();
-//
-//	public WordForm(String form){
-//		try{
-//			originalForm = form;
-//
-//			TransCoder tc = new TransCoder();
-//			tc.setParser("Unicode");
-//			tc.setConverter("BetaCode");
-//			matchForm = tc.getString(form);
-//
-////			System.out.println(matchForm);
-//			matchForm = matchForm.toLowerCase();
-//			matchForm = matchForm.replace("\\", "/");
-////			System.out.println(matchForm);
-//		}catch(Exception e){
-//
-//		}
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class WordForm {
+	/*
+	<number>dual</number>
+	<number>pl</number>
+	<number>sg</number>
+	 */
+	public enum Number{
+		DUAL,
+		PLURAL,
+		SINGULAR;
+
+		public static Number fromString(String text) {
+			if (text != null) {
+				switch(text){
+				case "dual":
+					return Number.DUAL;
+				case "pl":
+					return Number.PLURAL;
+				case "sg":
+					return Number.SINGULAR;
+				}
+			}
+			return null;
+		}
+	}
+
+	/*
+	<pos>adj</pos>
+	<pos>adverbial</pos>
+	<pos>adv</pos>
+	<pos>article</pos>
+	<pos>conj</pos>
+	<pos>exclam</pos>
+	<pos>irreg</pos>
+	<pos>noun</pos>
+	<pos>numeral</pos>
+	<pos>partic</pos>
+	<pos>part</pos>
+	<pos>prep</pos>
+	<pos>pron</pos>
+	<pos>verb</pos>
+	 */
+	private Position position;
+	public enum Position{
+		ADJETIVE,
+		ADVERBIAL,
+		ADVERBE,
+		ARTICLE,
+		CONJUNCTION,
+		EXCLAMATION,
+		IRREGULAR,
+		NOUN,
+		NUMERAL,
+		PARTICLE,
+		PARTICIPLE,
+		PREPOSITION,
+		PRONOUN,
+		VERB;
+
+		public static Position fromString(String text) {
+			if (text != null) {
+				switch(text){
+				case "adj":
+					return Position.ADJETIVE;
+				case "adverbial":
+					return Position.ADVERBIAL;
+				case "adv":
+					return Position.ADVERBE;
+				case "article":
+					return Position.ARTICLE;
+				case "conj":
+					return Position.CONJUNCTION;
+				case "exclam":
+					return Position.EXCLAMATION;
+				case "irreg":
+					return Position.IRREGULAR;
+				case "noun":
+					return Position.NOUN;
+				case "numeral":
+					return Position.NUMERAL;
+				case "partic":
+					return Position.PARTICLE;
+				case "part":
+					return Position.PARTICIPLE;
+				case "prep":
+					return Position.PREPOSITION;
+				case "pron":
+					return Position.PRONOUN;
+				case "verb":
+					return Position.VERB;
+				}
+			}
+			return null;
+		}
+	}
+
+	private List<WordDialect> dialects = new ArrayList<WordDialect>();
+	private List<String> features = new ArrayList<String>();
+//	
+//	public Number getNumber() {
+//		return number;
 //	}
-//}
+//
+//	public void setNumber(Number number) {
+//		this.number = number;
+//	}
+
+
+	public Position getPosition() {
+		return position;
+	}
+
+	public void setPosition(Position position) {
+		this.position = position;
+	}
+
+	public List<String> getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(List<String> features) {
+		this.features = features;
+	}
+
+	public List<WordDialect> getDialects() {
+		return dialects;
+	}
+
+	public void setDialects(List<WordDialect> dialects) {
+		this.dialects = dialects;
+	}
+	
+
+
+}
