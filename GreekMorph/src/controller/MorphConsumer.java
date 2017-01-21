@@ -29,14 +29,9 @@ public class MorphConsumer implements Runnable {
 	private BlockingQueue<WordMorphDTO> sharedQueueInput;
 	private Set<String> sharedWords;
 	private Set<String> sharedWordLemmas;
-	//	private List<Word> sharedQueueWords;
-	//	private List<WordLemma> sharedQueueLemmas;
-	//	private MorphProducer producer;
-	//	private ControllerLoader controllerLoader;
 	private List<Word> words;
 	private List<WordLemma> lemmas;
 	private List<WordDialect> dialects;
-	private List<String> strings = new ArrayList<String>();
 
 	public MorphConsumer(BlockingQueue<WordMorphDTO> sharedQueue, Set<String> sharedStrings, Set <String> sharedWordLemmas, List<Word> words, List<WordLemma> lemmas, List<WordDialect> dialects){
 		//		, List<WordLemma> lemmasList, List<Word> wordsList) {
@@ -81,17 +76,6 @@ public class MorphConsumer implements Runnable {
 					System.out.println("[ERROR] Word does not have form OR lemma");
 					//						return response;
 				}		
-
-				//					String position =  this.elementGet(element, "pos");
-				//					String number = this.elementGet(element, "number");
-				//					String tense = this.elementGet(element, "tense");
-				//					String voice = this.elementGet(element, "voice");
-				//					String mode = this.elementGet(element, "mood");
-				//					String gender = this.elementGet(element, "gender");
-				//					String person = this.elementGet(element, "person");
-				//					String wCase= this.elementGet(element, "case");
-				//					String dialects = this.elementGet(element, "dialect");
-				//					String features = this.elementGet(element, "feature");
 
 				String position =  element.position;
 				String number = element.number;
@@ -196,7 +180,7 @@ public class MorphConsumer implements Runnable {
 
 				long endTime = System.nanoTime();
 				long duration = (endTime - startTime) / 1000000;  //divide by 1000000
-				//				logger.info(Thread.currentThread().getName()+" RUNNING CONF TOOK "+duration+" msecs");
+				logger.info(Thread.currentThread().getName()+" RUNNING CONF TOOK "+duration+" msecs");
 
 				//					return response;
 
