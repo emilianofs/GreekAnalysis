@@ -9,7 +9,7 @@ public class WordForm {
 	<number>pl</number>
 	<number>sg</number>
 	 */
-	private WordLemma lemma;
+//	private WordLemma lemma;
 	private List<WordDialect> dialects = new ArrayList<WordDialect>();
 	private List<String> features = new ArrayList<String>();
 	
@@ -138,12 +138,12 @@ public class WordForm {
 		this.dialects = dialects;
 	}
 
-	public WordLemma getLemma() {
-		return lemma;
-	}
-
-	public void setLemma(WordLemma lemma) {
-		this.lemma = lemma;
-	}
+//	public WordLemma getLemma() {
+//		return lemma;
+//	}
+//
+//	public void setLemma(WordLemma lemma) {
+//		this.lemma = lemma;
+//	}
 
 }

@@ -9,7 +9,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import dtos.WordMorphDTO;
 
-public class ElementMatchHandler extends DefaultHandler{
+public class HandlerMorph extends DefaultHandler{
 	private String elementName = "analysis";
 	private boolean inElement;
 
@@ -19,7 +19,7 @@ public class ElementMatchHandler extends DefaultHandler{
 
 	private StringBuffer tagText = new StringBuffer();
 
-	public ElementMatchHandler(String elementName) {
+	public HandlerMorph(String elementName) {
 		this.elementName = elementName;
 	}
 

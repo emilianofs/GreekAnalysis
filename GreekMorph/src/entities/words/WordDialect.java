@@ -3,6 +3,10 @@ package entities.words;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
+
 public class WordDialect {
 	//<dialect>attic epic doric ionic aeolic parad_form prose poetic</dialect>
 
@@ -43,10 +47,13 @@ public class WordDialect {
 			return null;
 		}
 	}
+	@Enumerated(EnumType.STRING)
 	private Dialect dialect;
 	
+	@OneToMany(mappedBy="dialect")
 	private List<WordForm> words = new ArrayList<WordForm>();
 	
+	/************/
 	public Dialect getDialect() {
 		return dialect;
 	}

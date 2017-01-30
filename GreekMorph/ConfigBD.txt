@@ -1,0 +1,5 @@
+driver=com.mysql.jdbc.Driver
+jdbc=jdbc:mysql://localhost/onomazw?useServerPrepStmts=false&rewriteBatchedStatements=true
+usuario=onomazw
+password=onomazw
+conexiones=10

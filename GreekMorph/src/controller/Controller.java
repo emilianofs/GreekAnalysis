@@ -1,49 +1,44 @@
 package controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import edu.unc.epidoc.transcoder.TransCoder;
-import entities.DiscourseFragment;
-import entities.words.Word;
-import entities.words.WordLemma;
+import entities.words.Language;
+import model.agents.AgentMorphFragments;
+import model.world.ModelWorld;
 
 
 public class Controller extends DefaultHandler  {
+	private static final Logger logger = Logger.getLogger( Controller.class.getName() );
 
-	private static ControllerLoader lemmaController = new ControllerLoader();
-//	private static Controller mainController = new Controller();
+	private static ControllerMorph lemmaController = new ControllerMorph();
+	private static ControllerAuthor authorController = new ControllerAuthor();
 	
 	public static void main(String[] args){
 			System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
-		Controller controller = new Controller();
+//		Controller controller = new Controller();
 		try {
 //			System.out.println("loadLemmas()");
 //			controller.mainViejo(args);
-			lemmaController.lemmasLoadSAX();
+			authorController.heraclitoLoad();
+			lemmaController.morphLoadSAX("/home/inwx/documents/GRIEGO/greek.morph.xml", Language.LanguageName.GREEK);
+//			lemmaController.morphLoadSAX("/home/inwx/documents/GRIEGO/latin.morph.xml", Language.LanguageName.LATIN);
+			
+			logger.info("Languages Loaded "+lemmaController.getLanguages().size());
+			logger.info("Words Loaded "+lemmaController.getWords().size());
+			logger.info("Lemmas Loaded "+lemmaController.getLemmas().size());
+			
+			ModelWorld world = new ModelWorld(lemmaController.getWords(), lemmaController.getLemmas(), authorController.getFragments());
+			world.run();
+			
+			
 		}catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-//		
+		
 //	public void mainViejo(String[] args) {
 //		Controller controller = new Controller();
 //		try {
@@ -195,64 +190,25 @@ public class Controller extends DefaultHandler  {
 //		}
 //	}
 
-
 	
-	public List<DiscourseFragment> readXml () throws ParserConfigurationException{
-		List<DiscourseFragment> response = new ArrayList<DiscourseFragment>();
-		File fXmlFile = new File("fragments.xml");
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = null;
-		try {
-			doc = dBuilder.parse(fXmlFile);
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		doc.getDocumentElement().normalize();
-		System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-		NodeList nList = doc.getElementsByTagName("fragment");
-		System.out.println("----------------------------");
-		int id = 0;
-		for (int temp = 0; temp < nList.getLength(); temp++) {
-			Node nNode = nList.item(temp);
-//			System.out.println("\nCurrent Element :" + nNode.getNodeName());
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
-				DiscourseFragment fragment = new DiscourseFragment();
-				fragment.number =  eElement.getElementsByTagName("number").item(0).getTextContent();
-				fragment.text =  eElement.getElementsByTagName("text").item(0).getTextContent().replace("\n", "").replace("\r", "").replace("\t", "");
-				response.add(fragment);
-//				System.out.println("Fragment No : " + eElement.getElementsByTagName("number").item(0).getTextContent());
-//				System.out.println("Text : " + eElement.getElementsByTagName("text").item(0).getTextContent());
-
-			}
-		}
-		return response;
-	}
-	
-	public WordLemma searchLemma(List<WordLemma> words, String lemma){
-		WordLemma response = null;
-		for(int i=0; i < words.size(); i++){
-			if(words.get(i).lemma.equals(lemma)){
-				response = words.get(i);
-			}
-		}
-		
-		if(response == null){
-			WordLemma newLemma = new WordLemma();
-			newLemma.lemma = lemma;
-			newLemma.elements = new ArrayList<Word>();
-			words.add(newLemma);
-			response = newLemma;
-		}
-		
-		
-		return response;
-	}
+//	public WordLemma searchLemma(List<WordLemma> words, String lemma){
+//		WordLemma response = null;
+//		for(int i=0; i < words.size(); i++){
+//			if(words.get(i).lemma.equals(lemma)){
+//				response = words.get(i);
+//			}
+//		}
+//		
+//		if(response == null){
+//			WordLemma newLemma = new WordLemma();
+//			newLemma.lemma = lemma;
+//			newLemma.elements = new ArrayList<Word>();
+//			words.add(newLemma);
+//			response = newLemma;
+//		}
+//		
+//		
+//		return response;
+//	}
 	
 }
