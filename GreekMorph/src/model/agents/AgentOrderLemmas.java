@@ -40,13 +40,13 @@ public class AgentOrderLemmas extends Agent {
 		GraphADT<String, Set<String>> graph = new GraphLD<String, Set<String>>();
 		//		Set<String> nodes = new HashSet<String>();
 
-		for(DiscourseFragment fragmentA: fragments){
-			for(String lemma: fragmentA.getMorph().keySet()){
-				if(!graph.existsNode(lemma)){
-					graph.addNode(lemma);
-				}
-			}
-		}
+//		for(DiscourseFragment fragmentA: fragments){
+//			for(String lemma: fragmentA.getMorph().keySet()){
+//				if(!graph.existsNode(lemma)){
+//					graph.addNode(lemma);
+//				}
+//			}
+//		}
 
 
 		TransCoder tc = new TransCoder();
@@ -54,10 +54,43 @@ public class AgentOrderLemmas extends Agent {
 		tc.setConverter("UnicodeC");
 
 		for(DiscourseFragment fragmentA: fragments){
+			String fragmentNumber = fragmentA.getNumber();
+
+			if(!graph.existsNode(fragmentNumber)){
+				graph.addNode(fragmentNumber);
+			}
 //			graph.addNode(fragmentA.getNumber());
 			for(String lemma: fragmentA.getMorph().keySet()){
 //				if(fragmentA.getMorph().get(lemma) instanceof WordFormConjugated){
 				String nodeA = tc.getString(lemma);
+				
+/////////////////////////////////////				
+				if(!graph.existsEdge(nodeA, fragmentNumber) && !graph.existsEdge(fragmentNumber, nodeA)){
+					Set<String> edgeLemmas = new HashSet<String>();
+					edgeLemmas.add(fragmentA.getNumber());
+					graph.addEdge(nodeA, fragmentNumber, edgeLemmas);
+				}else{
+				
+					Float weight = null;
+					try{
+					Set<String> edgeLemmas = graph.weight(nodeA, fragmentNumber);
+					edgeLemmas.add(fragmentA.getNumber());
+//					graph.removeEdge(nodeA, nodeB);
+//					graph.addEdge(nodeA, nodeB, weight);
+					}catch(Exception e){
+					
+						if(weight == null){
+							Set<String> edgeLemmas = graph.weight(fragmentNumber, nodeA);
+//							weight = 1 / (weight + 1);
+							edgeLemmas.add(fragmentA.getNumber());
+//							graph.removeEdge(nodeB, nodeA);
+//							graph.addEdge(nodeB, nodeA, weight);
+						}
+					}
+				
+				}
+/////////////////////////////////////				
+				
 				for(String lemmaB: fragmentA.getMorph().keySet()){
 					String nodeB = tc.getString(lemmaB);
 					
@@ -136,7 +169,8 @@ public class AgentOrderLemmas extends Agent {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 		try {
-			pw = new PrintWriter(new File("/home/inwx/output/lemma-"+dateFormat.format(date)+".csv"));
+			pw = new PrintWriter(new File("C:\\output\\lemma-"+dateFormat.format(date)+".csv"));
+//			pw = new PrintWriter(new File("/home/inwx/output/lemma-"+dateFormat.format(date)+".csv"));
 			StringBuilder sb = new StringBuilder();
 
 			sb.append("NodeA");
@@ -159,20 +193,21 @@ public class AgentOrderLemmas extends Agent {
 				//			System.out.print("NodeA "+auxA.node+"\n");
 
 				while(auxB != null){
-					if(auxB.peso.size() > 1){
+//					if(auxB.peso.size() > 1){
 					sb = new StringBuilder();
 					sb.append(tc.getString(auxA.node));
 					sb.append(';');
 					sb.append(tc.getString(auxB.nodeD.node));
 					sb.append(';');
-					sb.append(Float.valueOf(1F/auxB.peso.size()));
+//					sb.append(Float.valueOf(1F/auxB.peso.size()));
+					sb.append(Float.valueOf(auxB.peso.size()));
 					sb.append(';');
 					sb.append(auxB.peso.toString());
 					sb.append('\n');
 					pw.write(sb.toString());
 
 					//					System.out.print(""+tc.getString(auxA.node)+";"+tc.getString(auxB.nodeD.node)+";"+ auxB.peso+"\n");
-					}
+//					}
 					auxB = auxB.sig;
 
 				}

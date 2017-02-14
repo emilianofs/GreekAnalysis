@@ -22,7 +22,8 @@ public class Controller extends DefaultHandler  {
 //			System.out.println("loadLemmas()");
 //			controller.mainViejo(args);
 			authorController.heraclitoLoad();
-			lemmaController.morphLoadSAX("/home/inwx/documents/GRIEGO/greek.morph.xml", Language.LanguageName.GREEK);
+			lemmaController.morphLoadSAX("C:\\greek.morph.xml", Language.LanguageName.GREEK);
+//			lemmaController.morphLoadSAX("/home/inwx/documents/GRIEGO/greek.morph.xml", Language.LanguageName.GREEK);
 //			lemmaController.morphLoadSAX("/home/inwx/documents/GRIEGO/latin.morph.xml", Language.LanguageName.LATIN);
 			
 			logger.info("Languages Loaded "+lemmaController.getLanguages().size());
