@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import adts.GraphADT;
 import adts.GraphLD;
+import adts.GraphLD.Edge;
+import adts.GraphLD.Node;
 import edu.unc.epidoc.transcoder.TransCoder;
 import entities.DiscourseFragment;
 import entities.words.Word;
@@ -30,7 +32,7 @@ public class AgentOrderFragments extends Agent {
 		Set<Word> words= world.getWords();
 		Set<WordLemma> lemmas = world.getLemmas();
 		
-		GraphADT graph = new GraphLD();
+		GraphADT<String, Set<String>> graph = new GraphLD<String, Set<String>>();
 		
 //		for(DiscourseFragment d : fragments){
 //			graph.addNode(d.getNumber());
@@ -46,7 +48,7 @@ public class AgentOrderFragments extends Agent {
 				
 				if(fragmentA != fragmentB && !graph.existsEdge(fragmentA.getNumber(), fragmentB.getNumber())
 						&& !graph.existsEdge(fragmentB.getNumber(), fragmentA.getNumber())){
-					String a = "FragA "+fragmentA.getNumber()+" FragB "+fragmentB.getNumber();
+//					String a = "FragA "+fragmentA.getNumber()+" FragB "+fragmentB.getNumber();
 					Set<String> weight = this.weightFragments(fragmentA, fragmentB);
 //					logger.info(a+": "+weight);
 					if(weight.size() > 4){
@@ -57,7 +59,22 @@ public class AgentOrderFragments extends Agent {
 				}
 			}
 		}
-		graph.print();
+		
+		
+		GraphLD<String,Set<String>>.Node auxA = graph.first();
+		while(auxA != null){
+			GraphLD<String, Set<String>>.Edge auxB = auxA.ady;
+			//			System.out.print("NodeA "+auxA.node+"\n");
+
+			while(auxB != null){
+				System.out.print(""+auxA.node+";"+auxB.nodeD.node+";"+ auxB.peso.size()+";"+auxB.peso.toString()+"\n");
+				auxB = auxB.sig;
+
+			}
+
+			auxA = auxA.sig;
+		}
+//		graph.print();
 //		
 //		Set<GraphLD.Node> nodes = graph.nodes();
 //		for(GraphLD.Node n: nodes){

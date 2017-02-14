@@ -3,45 +3,15 @@ package entities.words;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
-
 import edu.unc.epidoc.transcoder.TransCoder;
-@Entity
-@Table(name="words")
+
 public class Word {
 
-	//	private WordLemma lemma; SACAR
-//	public List<Map<String,String>> result = new ArrayList<Map<String,String>>();
-//	public String lemmaString;
-//	
-	@Column(name="wordBetaCode")
 	protected String word_betaCode;
-	
-	@Column(name="wordUTF8")
-	protected String word_UTF8;
-//	
-	private WordLemma lemma;
-	
-	@ElementCollection
-	@CollectionTable(name="features", joinColumns=@JoinColumn(name="user_id"))
-	@Column(name="nickname")
+	protected String word_UTF8;	
+	protected WordLemma lemma;
 	protected List<String> features = new ArrayList<String>();
-//	protected List<String> dialects = new ArrayList<String>();
-	@OneToMany(cascade = CascadeType.ALL)
-	@PrimaryKeyJoinColumn
 	protected List<WordForm> wordForms = new ArrayList<WordForm>();
-	
-	@ManyToOne
-	@PrimaryKeyJoinColumn
 	protected Language language;
 
 	public List<String> getFeatures() {
@@ -59,6 +29,7 @@ public class Word {
 	public void setWordForms(List<WordForm> wordForms) {
 		this.wordForms = wordForms;
 	}
+
 	public String getWord_betaCode() {
 		return word_betaCode;
 	}
@@ -83,6 +54,14 @@ public class Word {
 		this.lemma = lemma;
 	}
 
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+	
 	public Word(){
 
 	}
@@ -105,12 +84,4 @@ public class Word {
 		}
 	}
 
-	public Language getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(Language language) {
-		this.language = language;
-	}
-	
 }

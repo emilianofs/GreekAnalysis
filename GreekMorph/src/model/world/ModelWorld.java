@@ -13,6 +13,9 @@ import entities.words.WordLemma;
 import model.agents.Agent;
 import model.agents.AgentMorphFragments;
 import model.agents.AgentOrderFragments;
+import model.agents.AgentOrderFragmentsDistance;
+import model.agents.AgentOrderLemmaCounter;
+import model.agents.AgentOrderLemmas;
 
 public class ModelWorld {
 	private static final Logger logger = Logger.getLogger( ModelWorld.class.getName() );
@@ -68,8 +71,14 @@ public class ModelWorld {
 		this.discourseFragments = discourseFragments;
 		AgentMorphFragments agent = new AgentMorphFragments(this);
 		agents.add(agent);
-		AgentOrderFragments agent2 = new AgentOrderFragments(this);
-		agents.add(agent2);
+//		AgentOrderFragments agent2 = new AgentOrderFragments(this);
+//		agents.add(agent2);
+		AgentOrderLemmas agent3 = new AgentOrderLemmas(this);
+		agents.add(agent3);
+//		AgentOrderFragmentsDistance agent4 = new AgentOrderFragmentsDistance(this);
+//		agents.add(agent4);
+//		AgentOrderLemmaCounter agent5 = new AgentOrderLemmaCounter(this);
+//		agents.add(agent5);
 //		TransCoder tc = new TransCoder();
 //		tc.setParser("BetaCode");
 //		tc.setConverter("UnicodeB");

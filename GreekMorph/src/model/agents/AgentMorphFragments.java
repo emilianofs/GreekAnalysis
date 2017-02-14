@@ -4,6 +4,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import edu.unc.epidoc.transcoder.TransCoder;
 import entities.DiscourseFragment;
 import entities.words.Word;
 import entities.words.WordLemma;
@@ -23,19 +24,24 @@ public class AgentMorphFragments extends Agent{
 		if(world == null){
 			throw new Exception();
 		}
-
+		TransCoder tc = new TransCoder();
+		tc.setParser("BetaCode");
+		tc.setConverter("UnicodeC");
+		
 		Set<DiscourseFragment> fragments = world.getDiscourseFragments();
 		Set<Word> words= world.getWords();
 		Set<WordLemma> lemmas = world.getLemmas();
 
 		for(DiscourseFragment frag: fragments){
-//			System.out.println("Fragment "+frag.getNumber()+" Text "+frag.getText());
+//			logger.info("Fragment "+frag.getNumber()+" Text "+frag.getText());
 			for(String word: frag.getWordList()){
+				if(this.includeWord(word)){
 				Word morph = world.wordSearch(word);
 				if(morph != null){
 					frag.getMorph().put(morph.getLemma().getWord_betaCode(), morph);
 				}else{
-					logger.info("\t"+word+" not found");
+					logger.info("\t"+tc.getString(word)+" notfound");
+				}
 				}
 			}
 		}
@@ -50,5 +56,19 @@ public class AgentMorphFragments extends Agent{
 			}
 			
 		}
+	}
+	
+	private boolean includeWord(String word){
+		boolean response = true;
+		switch(word){
+		case ")o":
+			response = false;
+			break;
+		default:
+			response = true;
+			break;
+		}
+		
+		return response;
 	}
 }

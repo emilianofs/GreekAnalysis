@@ -4,17 +4,18 @@ import java.util.Set;
 
 import adts.GraphLD.Node;
 
-public interface GraphADT {
+public interface GraphADT<N,W> {
 	void init();
-	void addNode(String node);
-	void addEdge(String nodeA, String nodeB, Set<String> weight);
-	void removeNode(String node);
-	void removeEdge(String nodeA, String nodeB);
-	Set<Node> nodes();
-	Set<String> weight(String nodeA, String nodeB);
-	boolean existsEdge(String nodeA, String nodeB);
-	boolean existsNode(String nodeA);
-	Set<Node> adjacents(String node);
-	String choose();
-	void print();
+	void addNode(N node);
+	void addEdge(N nodeA, N nodeB, W weight);
+	void removeNode(N node);
+	void removeEdge(N nodeA, N nodeB);
+	Set<GraphLD<N,W>.Node> nodes();
+	W weight(N nodeA, N nodeB);
+	boolean existsEdge(N nodeA, N nodeB);
+	boolean existsNode(N nodeA);
+	Set<GraphLD<N,W>.Node> adjacents(N node);
+	GraphLD<N,W>.Node buscarVertice(N node);
+	GraphLD<N,W>.Node first();
+	N choose();
 }

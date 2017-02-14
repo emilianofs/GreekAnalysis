@@ -41,10 +41,10 @@ public class DiscourseFragment {
 		tc.setConverter("BetaCode");
 		String textBeta = tc.getString(text);
 		
-		System.out.println(text);
-		System.out.println(textBeta);
+//		System.out.println(text);
+//		System.out.println(textBeta);
 		textBeta = textBeta.toLowerCase();
-		System.out.println(textBeta);
+//		System.out.println(textBeta);
 		String[] wordList = textBeta.split(" ");
 		List<String> itemList = Arrays.asList(wordList);
 		for(String word: itemList){

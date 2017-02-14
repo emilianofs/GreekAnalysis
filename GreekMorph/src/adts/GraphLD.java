@@ -1,20 +1,19 @@
 package adts;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-public class GraphLD implements GraphADT {
+public class GraphLD<N,W> implements GraphADT<N,W> {
 
 	public class Node{
-		public String node;
+		public N node;
 		public Edge ady;
 		public Node sig;
 	}
 
 	public class Edge{
 		//		public int peso;
-		Set<String> peso = new HashSet<String>();
+		public W peso;
 		public Node nodeD;
 		public Edge sig;
 	}
@@ -22,7 +21,7 @@ public class GraphLD implements GraphADT {
 	Node vertices;
 
 	@Override
-	public Set<Node> adjacents(String node) {
+	public Set<Node> adjacents(N node) {
 		Node Origen = buscarVertice(node);
 		Set<Node> adyacentes = new HashSet<Node>();
 		//		adyacentes.InicializarConjunto();
@@ -37,7 +36,7 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public void addEdge(String nodeA, String nodeB, Set<String> weight) {
+	public void addEdge(N nodeA, N nodeB, W weight) {
 		Node Origen = buscarVertice(nodeA);
 		Node Destino = buscarVertice(nodeB);
 
@@ -48,7 +47,7 @@ public class GraphLD implements GraphADT {
 			}
 
 			if(auxArista != null){
-				auxArista.peso = (Set<String>) weight;
+				auxArista.peso = (W) weight;
 			}else{
 				Edge nueva = new Edge();
 				nueva.peso = weight;
@@ -60,7 +59,7 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public void addNode(String node) {
+	public void addNode(N node) {
 		Node aux = vertices;
 
 		while(aux != null && !aux.node.equals(node)){
@@ -76,12 +75,12 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public String choose() {
+	public N choose() {
 		return vertices.node;
 	}
 
 	@Override
-	public void removeEdge(String nodeA, String nodeB) {
+	public void removeEdge(N nodeA, N nodeB) {
 		Node Origen = buscarVertice(nodeA);
 		Node Destino = buscarVertice(nodeB);
 
@@ -101,7 +100,7 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public void removeNode(String node) {
+	public void removeNode(N node) {
 		Node vertElim = buscarVertice(node);
 		if(vertElim != null){ // Si el vertice existe...
 			Node auxVert = vertices;
@@ -128,7 +127,7 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public boolean existsEdge(String nodeA, String nodeB) {
+	public boolean existsEdge(N nodeA, N nodeB) {
 		Node Origen = buscarVertice(nodeA);
 		Node Destino = buscarVertice(nodeB);
 		if(Origen == null){
@@ -152,7 +151,7 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public Set<String> weight(String nodeA, String nodeB) {
+	public W weight(N nodeA, N nodeB) {
 		Node Origen = buscarVertice(nodeA);
 		Node Destino = buscarVertice(nodeB);
 		Edge aristas = Origen.ady;
@@ -174,7 +173,8 @@ public class GraphLD implements GraphADT {
 		return vert;
 	}
 
-	private Node buscarVertice(String node){
+	@Override
+	public Node buscarVertice(N node){
 		Node aux = vertices;
 		while(aux != null && !aux.node.equals(node)){
 			aux = aux.sig;
@@ -197,7 +197,7 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public boolean existsNode(String nodeA) {
+	public boolean existsNode(N nodeA) {
 		boolean response = false;
 		Node aux = vertices;
 		while(aux != null && !aux.node.equals(nodeA)){
@@ -210,19 +210,23 @@ public class GraphLD implements GraphADT {
 	}
 
 	@Override
-	public void print(){
-		Node auxA = vertices;
-		while(auxA != null){
-			Edge auxB = auxA.ady;
-			//			System.out.print("NodeA "+auxA.node+"\n");
-
-			while(auxB != null){
-				System.out.print(""+auxA.node+";"+auxB.nodeD.node+";"+auxB.peso.size()+";"+auxB.peso.toString()+"\n");
-				auxB = auxB.sig;
-
-			}
-
-			auxA = auxA.sig;
-		}
+	public Node first(){
+		return vertices;
 	}
+//	@Override
+//	public void print(){
+//		Node auxA = vertices;
+//		while(auxA != null){
+//			Edge auxB = auxA.ady;
+//			//			System.out.print("NodeA "+auxA.node+"\n");
+//
+//			while(auxB != null){
+//				System.out.print(""+auxA.node+";"+auxB.nodeD.node+";"+auxB.peso.size()+";"+auxB.peso.toString()+"\n");
+//				auxB = auxB.sig;
+//
+//			}
+//
+//			auxA = auxA.sig;
+//		}
+//	}
 }
