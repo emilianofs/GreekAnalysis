@@ -5,11 +5,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import adts.GraphADT;
@@ -20,14 +19,13 @@ import entities.words.Word;
 import entities.words.WordLemma;
 import model.world.ModelWorld;
 
-public class AgentOrderFragmentsDistance extends Agent {
-//	Imprime FragmentA, FragmentB, Weight - Graph
-	
-	private static final Logger logger = Logger.getLogger( AgentOrderFragmentsDistance.class.getName() );
+public class AgentOrderFragmentDijkstra extends Agent {
+	//	Imprime Fragment, Lemma - No Graph
+	private static final Logger logger = Logger.getLogger( AgentOrderFragmentDijkstra.class.getName() );
 
 	private ModelWorld world;
 
-	public AgentOrderFragmentsDistance(ModelWorld world){
+	public AgentOrderFragmentDijkstra(ModelWorld world){
 		this.world = world;
 	}
 	@Override
@@ -36,92 +34,88 @@ public class AgentOrderFragmentsDistance extends Agent {
 			throw new Exception();
 		}
 
+		TransCoder tc = new TransCoder();
+		tc.setParser("BetaCode");
+		tc.setConverter("UnicodeC");
+
 		Set<DiscourseFragment> fragments = world.getDiscourseFragments();
 		Set<Word> words= world.getWords();
 		Set<WordLemma> lemmas = world.getLemmas();
 
-		TransCoder tc = new TransCoder();
-		tc.setParser("BetaCode");
-		tc.setConverter("UnicodeC");
-		
-		GraphADT<String, Float> graph = new GraphLD<String, Float>();
-		
-//		for(DiscourseFragment d : fragments){
-//			graph.addNode(d.getNumber());
-//			}
-		
-		int i = 0;
+
+		GraphADT<String, Set<String>> graph = new GraphLD<String, Set<String>>();
+
+
 		for(DiscourseFragment fragmentA: fragments){
 			graph.addNode(fragmentA.getNumber());
 			for(DiscourseFragment fragmentB: fragments){
 				if(!graph.existsNode(fragmentB.getNumber())){
 					graph.addNode(fragmentB.getNumber());
 				}
-				
-				if(fragmentA != fragmentB && !graph.existsEdge(fragmentA.getNumber(), fragmentB.getNumber())
-						&& !graph.existsEdge(fragmentB.getNumber(), fragmentA.getNumber())){
-					Set<String> weight = this.weightFragments(fragmentA, fragmentB);
-//					logger.info(a+": "+weight);
-					if(weight.size() > 4){
+				Set<String> weight = this.weightFragments(fragmentA, fragmentB);
+				if(weight.size() >0){
+					//				&& 
+					if(fragmentA != fragmentB && !graph.existsEdge(fragmentA.getNumber(), fragmentB.getNumber())){
+						weight = this.weightFragments(fragmentA, fragmentB);
 						logger.info("Adding fragmentA "+fragmentA.getNumber()+" fragmentB "+fragmentB.getNumber()+" weight "+weight);
-						graph.addEdge(fragmentA.getNumber(), fragmentB.getNumber(), Float.valueOf((1F / weight.size())));
-//					if(weight > 3)
+						graph.addEdge(fragmentA.getNumber(), fragmentB.getNumber(), weight);
+
+					}
+
+					if(fragmentA != fragmentB && !graph.existsEdge(fragmentB.getNumber(), fragmentA.getNumber())){
+						weight = this.weightFragments(fragmentA, fragmentB);
+						logger.info("Adding fragmentB "+fragmentA.getNumber()+" fragmentA "+fragmentB.getNumber()+" weight "+weight);
+						graph.addEdge(fragmentB.getNumber(), fragmentA.getNumber(), weight);
+
 					}
 				}
 			}
 		}
-		
-		
-//		GraphLD<String, Float>.Node auxA = graph.first();
-//		while(auxA != null){
-//			GraphLD<String, Float>.Edge auxB = auxA.ady;
-//			//			System.out.print("NodeA "+auxA.node+"\n");
-//
-//			while(auxB != null){
-//				System.out.print(""+auxA.node+";"+auxB.nodeD.node+";"+ auxB.peso+";"+auxB.peso.toString()+"\n");
-//				auxB = auxB.sig;
-//
-//			}
-//
-//			auxA = auxA.sig;
-//		}
 
 		PrintWriter pw = null;
 		Date date = new Date() ;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 
 		try {
-			pw = new PrintWriter(new File("/home/inwx/output/order2-"+dateFormat.format(date)+".csv"));
+			//			pw = new PrintWriter(new File("C:\\output\\lemma-"+dateFormat.format(date)+".csv"));
+			pw = new PrintWriter(new File("/home/inwx/output/lemma-"+dateFormat.format(date)+".csv"));
 			StringBuilder sb = new StringBuilder();
 
 			sb.append("NodeA");
-			sb.append(',');
+			sb.append(';');
 			sb.append("NodeB");
-			sb.append(',');
+			sb.append(';');
 			sb.append("Weight");
+			sb.append(";");
+			sb.append("Lemmas");
 			sb.append('\n');
 
 			pw.write(sb.toString());
 
 
-			GraphLD<String, Float>.Node auxA = graph.first();
-			
+			GraphLD<String, Set<String>>.Node auxA = graph.first();
+
 
 			while(auxA != null){
-				GraphLD<String, Float>.Edge auxB = auxA.ady;
+				GraphLD<String, Set<String>>.Edge auxB = auxA.ady;
 				//			System.out.print("NodeA "+auxA.node+"\n");
 
 				while(auxB != null){
+					//					if(auxB.peso.size() > 1){
 					sb = new StringBuilder();
 					sb.append(tc.getString(auxA.node));
-					sb.append(',');
+					sb.append(';');
 					sb.append(tc.getString(auxB.nodeD.node));
-					sb.append(',');
-					sb.append(auxB.peso);
+					sb.append(';');
+					//					sb.append(Float.valueOf(1F/auxB.peso.size()));
+					sb.append(Float.valueOf(auxB.peso.size()));
+					sb.append(';');
+					sb.append(auxB.peso.toString());
 					sb.append('\n');
 					pw.write(sb.toString());
 
 					//					System.out.print(""+tc.getString(auxA.node)+";"+tc.getString(auxB.nodeD.node)+";"+ auxB.peso+"\n");
+					//					}
 					auxB = auxB.sig;
 
 				}
@@ -139,8 +133,8 @@ public class AgentOrderFragmentsDistance extends Agent {
 				pw.close();
 			}
 		}
+
 	}
-	
 
 	private Set<String> weightFragments(DiscourseFragment fragmentA, DiscourseFragment fragmentB) throws Exception{
 		Set<String> response = new HashSet<String>();
@@ -149,13 +143,14 @@ public class AgentOrderFragmentsDistance extends Agent {
 		TransCoder tc = new TransCoder();
 		tc.setParser("BetaCode");
 		tc.setConverter("UnicodeC");
-		
+
 		for(String a: fragA){
 			if(fragB.contains(a)){
-//				logger.info("wordA "+a);
+				//				logger.info("wordA "+a);
 				response.add(tc.getString(a));
 			}
 		}
+		
 		return response;
 	}
 }

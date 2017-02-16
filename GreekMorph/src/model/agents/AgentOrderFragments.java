@@ -15,6 +15,8 @@ import entities.words.WordLemma;
 import model.world.ModelWorld;
 
 public class AgentOrderFragments extends Agent {
+//	Falta que tire el output a un file
+//	Imprime FragmentoA, FragmentoB, Weight, LemmasShared - Graph
 	private static final Logger logger = Logger.getLogger( AgentOrderFragments.class.getName() );
 
 	private ModelWorld world;

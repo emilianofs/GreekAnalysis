@@ -19,6 +19,8 @@ import entities.words.WordLemma;
 import model.world.ModelWorld;
 
 public class AgentOrderLemmas extends Agent {
+//	LemmaA/FragmentA, LemmaB/FragmentB, Weight, FragmentsShared
+//	
 	private static final Logger logger = Logger.getLogger( AgentOrderLemmas.class.getName() );
 
 	private ModelWorld world;

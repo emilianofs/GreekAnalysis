@@ -14,7 +14,7 @@ import model.agents.Agent;
 import model.agents.AgentMorphFragments;
 import model.agents.AgentOrderFragments;
 import model.agents.AgentOrderFragmentsDistance;
-import model.agents.AgentOrderLemmaCounter;
+import model.agents.AgentOrderFragmentDijkstra;
 import model.agents.AgentOrderLemmas;
 
 public class ModelWorld {
@@ -71,10 +71,10 @@ public class ModelWorld {
 		this.discourseFragments = discourseFragments;
 		AgentMorphFragments agent = new AgentMorphFragments(this);
 		agents.add(agent);
-//		AgentOrderFragments agent2 = new AgentOrderFragments(this);
-//		agents.add(agent2);
-		AgentOrderLemmas agent3 = new AgentOrderLemmas(this);
-		agents.add(agent3);
+		AgentOrderFragmentDijkstra agent2 = new AgentOrderFragmentDijkstra(this);
+		agents.add(agent2);
+//		AgentOrderLemmas agent3 = new AgentOrderLemmas(this);
+//		agents.add(agent3);
 //		AgentOrderFragmentsDistance agent4 = new AgentOrderFragmentsDistance(this);
 //		agents.add(agent4);
 //		AgentOrderLemmaCounter agent5 = new AgentOrderLemmaCounter(this);
